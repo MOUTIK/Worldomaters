@@ -111,7 +111,7 @@
     <section id="featured-services" class="featured-services">
       <div class="container" data-aos="fade-up">
         <h3>  Statistiques totales de Corona : </h3>
-        <div class="row">
+        <div class="row" style="display: flex; flex-direction: row; align-content: center; justify-content: space-evenly; align-items: center; ">
           <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
             <div class="icon-box" data-aos="fade-up" data-aos-delay="400">
               <div class="icon"><i class="fas fa-dna"></i></div>
@@ -139,7 +139,12 @@
           </div> 
 
         </div>
+        <br>
+        <h3>  Statistiques totales de Corona par région : </h3>
+        <br>
+        <div id="CoronaRegion" class="row" style="display: flex; flex-direction: row; align-content: center; justify-content: space-evenly; align-items: center; ">
 
+        </div>
       </div>
     </section><!-- End Featured Services Section -->
 
@@ -777,36 +782,85 @@
   <script src="assets/js/main.js"></script>
 
   <script>
-    const targetUrl = 'https://www.covidmaroc.ma/Pages/Accueilfr.aspx';
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-        var tempDiv = document.createElement('div');
-        tempDiv.innerHTML = xhr.response;
-        var total__case = 0;
-        var tr = tempDiv.querySelectorAll(".ms-rtestate-field div table tr")
-        tr?.forEach((item,i) => {
-          if(i != 0 && i < tr.length - 1){
-            (item.querySelectorAll("td p span"))?.forEach((span,j) => {
-              if(i == 1){
-                var __number = (span.innerText.match(/[0-9]{0,}\d/g))
-                document.querySelector(`#Case__`+j).innerHTML = "<span> "+__number.join(" ") + "</span>";
+    const Statistiques_totales_de_Corona = () => {
+      try{
+        const targetUrl = 'https://www.covidmaroc.ma/Pages/Accueilfr.aspx';
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = xhr.response;
+            var total__case = 0;
+            var tr = tempDiv.querySelectorAll(".ms-rtestate-field div table tr")
+            tr?.forEach((item,i) => {
+              if(i != 0 && i < tr.length - 1){
+                (item.querySelectorAll("td p span"))?.forEach((span,j) => {
+                  if(i == 1){
+                    var __number = (span.innerText.match(/[0-9]{0,}\d/g))
+                    document.querySelector(`#Case__`+j).innerHTML = "<span> "+__number.join(" ") + "</span>";
+                  }
+                  if(i == 2){
+                    var s_Span = span.querySelectorAll("span")
+                    if(s_Span?.length > 0){
+                      var __number = (s_Span[0].innerText.match(/[0-9]{0,}\d/g))
+                      document.querySelector(`#Case__`+2).innerHTML =  "<span> "+__number.join(" ") + "</span>";
+                    }
+                  }
+                 
+                })
               }
-              if(i == 2){
-                var s_Span = span.querySelectorAll("span")
-                if(s_Span?.length > 0){
-                  var __number = (s_Span[0].innerText.match(/[0-9]{0,}\d/g))
-                  document.querySelector(`#Case__`+2).innerHTML =  "<span> "+__number.join(" ") + "</span>";
-                }
-              }
-
             })
           }
-        })
+        };
+        xhr.open('GET', targetUrl);
+        xhr.send();
+      }catch(err){
+        console.error(err?.message)
       }
-    };
-    xhr.open('GET', targetUrl);
-    xhr.send();
+    }
+    const Total_des_cas_par_region = () => {
+      try{
+        const targetUrl = 'https://sehhty.com/ma-covid/#counter-stats';
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200){
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = xhr.response;
+            var ul = tempDiv.querySelectorAll("#counter-stats .qa-nav-main .qa-nav-main-list")
+            const DivContent = (titleFr,titleAR,totalRegion) => {
+              return (
+                `<div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" style="margin-bottom:30px !important">
+                  <div class="icon-box" data-aos="fade-up" data-aos-delay="400" style="width:100%;background: #fff">
+                    <h4 class="title"><a href="" >${titleFr}</a></h4>
+                    <hr/>
+                    <h4 class="title" style="direction: rtl;"><a href="" >${titleAR}</a></h4>
+                    <hr/>
+                    <p class="description" style="text-align: center;font-weight: bold;font-size: 24px;">${totalRegion}</p>
+                  </div>
+                 </div>`
+              )
+            }
+            const li = ul[2].querySelectorAll("li");
+            const CoronaRegion = document.querySelector("#CoronaRegion")
+            tempDiv.innerText = null;
+            li?.forEach((item,i) => {
+              const div = item.querySelectorAll("div:not(.cardactive)")
+              console.log(div)
+              CoronaRegion.innerHTML += DivContent(div[1]?.innerText,div[0]?.innerText,div[2]?.innerText);
+            })
+          }
+        }
+        xhr.open('GET', targetUrl);
+        xhr.send();
+      }catch(err){
+        console.error(err?.message)
+      }
+    }
+    (() => {
+      Statistiques_totales_de_Corona();
+      Total_des_cas_par_region();
+    })();
+
   </script>
 </body>
 

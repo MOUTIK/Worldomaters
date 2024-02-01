@@ -726,7 +726,8 @@ section {
 }
 
 .featured-services .icon-box:hover::before {
-  background: #3fbbc0;
+  /*background: #3fbbc0;*/
+  background: orangered;
   top: 0;
   border-radius: 0px;
 }
